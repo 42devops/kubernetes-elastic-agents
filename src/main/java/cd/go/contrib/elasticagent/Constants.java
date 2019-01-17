@@ -55,6 +55,7 @@ public interface Constants {
     String KUBERNETES_POD_CREATION_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
     String POD_POSTFIX = "POD_POSTFIX";
+    String PIPELINE_NAME = "PIPELINE_NAME";
     String CONTAINER_POSTFIX = "CONTAINER_POSTFIX";
     String GOCD_AGENT_IMAGE = "GOCD_AGENT_IMAGE";
     String LATEST_VERSION = "LATEST_VERSION";

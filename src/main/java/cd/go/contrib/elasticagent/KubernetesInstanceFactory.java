@@ -16,6 +16,7 @@
 
 package cd.go.contrib.elasticagent;
 
+import cd.go.contrib.elasticagent.model.JobIdentifier;
 import cd.go.contrib.elasticagent.requests.CreateAgentRequest;
 import cd.go.contrib.elasticagent.utils.Size;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -213,7 +214,7 @@ public class KubernetesInstanceFactory {
     private KubernetesInstance createUsingPodYaml(CreateAgentRequest request, PluginSettings settings, KubernetesClient client, PluginRequest pluginRequest) {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         String podYaml = request.properties().get(POD_CONFIGURATION.getKey());
-        String templatizedPodYaml = getTemplatizedPodYamlString(podYaml);
+        String templatizedPodYaml = getTemplatizedPodYamlString(podYaml, request.jobIdentifier());
 
         Pod elasticAgentPod = new Pod();
         try {
@@ -233,6 +234,20 @@ public class KubernetesInstanceFactory {
         Mustache mustache = mf.compile(new StringReader(podYaml), "templatePod");
         mustache.execute(writer, KubernetesInstanceFactory.getJinJavaContext());
         return writer.toString();
+    }
+
+    public static String getTemplatizedPodYamlString(String podYaml, JobIdentifier identifier) {
+        StringWriter writer = new StringWriter();
+        MustacheFactory mf = new DefaultMustacheFactory();
+        Mustache mustache = mf.compile(new StringReader(podYaml), "templatePod");
+        mustache.execute(writer, getJinJavaContext(identifier.getPipelineName()));
+        return writer.toString();
+    }
+
+    private static Map<String, String> getJinJavaContext(String pipelineName) {
+        Map<String, String> context = getJinJavaContext();
+        context.put(PIPELINE_NAME, pipelineName);
+        return context;
     }
 
     public static Map<String, String> getJinJavaContext() {
